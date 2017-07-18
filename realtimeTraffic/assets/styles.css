@@ -1,0 +1,26 @@
+li.site {
+    cursor: pointer
+}
+#atrMap {
+    height: 700px
+}
+.infoWrapper {
+    max-height: 700px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.modal-title {
+    font-weight: bold;
+    font-size: 1.5em
+}
+.chart-container {
+    margin: 10px 0
+}
+#dir1Speed, #dir2Speed {
+    font-weight: bold;
+    font-size: 3em;
+}
+.modal-body {
+    padding: 0 30px;
+    overflow: auto;
+}
