@@ -1,16 +1,27 @@
 $(document).ready(function(){
-
     $("#localBtn").on("click",()=>{
-        map.setCenter({lat: 32.486169, lng: -80.880322});
-        map.setZoom(10);
+        map.setCenter(localCenter);
+        map.setZoom(localZoom);
+
     })   
     $("#stateBtn").on("click",()=>{
-        map.setCenter({lat:33.707088, lng:-80.113444});
-        map.setZoom(8);
+        map.setCenter(stateCenter);
+        map.setZoom(stateZoom); 
     })
 })// end doc ready
 
-var newCenter, newZoom;
+Chart.scaleService.updateScaleDefaults('linear', {
+    ticks: {
+        min: 0
+    }
+});
+
+localCenter = {lat: 32.353968, lng: -80.893852};
+localZoom = 9;
+
+stateCenter = {lat:33.027134, lng:-80.364184};
+stateZoom = 8;
+
 const apiHost = "https://scdotatrapi.herokuapp.com";
 //const apiHost = "http://localhost:3000";
 
@@ -38,35 +49,35 @@ fetchData = ( site, place ) => {
             $("#msgModalBody").html(noDataMsg)
         }
         else {
-            $("#msgModal").modal("hide")
+            $("#msgModal").modal("hide");
             $("#recentDataModal").modal("show");
 
-                // chart init and config has to occur after modal is populated, since canvases aren't placed until then
-                // recent hour chart
-                var recentChart = new Chart($("#recentChart"),{
-                    type: 'horizontalBar',
-                    "options": hourChartOptions
-                });
+            // chart init and config has to occur after modal is populated, since canvases aren't placed until then
+            // recent hour chart
+            var recentChart = new Chart($("#recentChart"),{
+                type: 'horizontalBar',
+                "options": hourChartOptions
+            });
 
-                // update place name
-                $(".modal-title").html(place);
+            // update place name
+            $(".modal-title").html(place);
 
-                // update directional labels
-                $(".dir1Label").html(response.dirNames[0]);
-                $(".dir2Label").html(response.dirNames[1]);
+            // update directional labels
+            $(".dir1Label").html(response.dirNames[0]);
+            $(".dir2Label").html(response.dirNames[1]);
 
-                // full day charts
-                //direction 1 (appears in modal window established on index.html)
-                var dir1Day = new Chart($("#dir1day"), {
-                    type: 'bar',
-                    "options": dayChartOptions
-                });    
-                // direction 2 (also on index.html modal div)
-                var dir2Day = new Chart($("#dir2day"), {
-                    type: 'bar',
-                    "options": dayChartOptions
-                });    
-        
+            // full day charts
+            //direction 1 (appears in modal window established on index.html)
+            var dir1Day = new Chart($("#dir1day"), {
+                type: 'bar',
+                "options": dayChartOptions
+            });    
+            // direction 2 (also on index.html modal div)
+            var dir2Day = new Chart($("#dir2day"), {
+                type: 'bar',
+                "options": dayChartOptions
+            });    
+    
         // find last actual data
         
         let hourArray = ['1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM', '4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM','12 AM'];
@@ -159,7 +170,7 @@ fetchData = ( site, place ) => {
             // labels would be times for the whole chart
             "labels": hourArray
         }  // end of data object
-
+        console.log("dir1 data:",dir1FullDay,"dir2 data:",dir2FullDay);
              updateChart(dir1Day,dir1FullDay);
              updateChart(dir2Day,dir2FullDay);
         }
@@ -167,24 +178,36 @@ fetchData = ( site, place ) => {
 } // end fetchData function
 
 
-initMap = () => {
-    var center= {lat: 32.486169, lng: -80.880322};
-    var zoom = 10;
+initMap = () => { 
+    var center= localCenter;
+    var zoom = localZoom;
     
     map = new google.maps.Map(document.getElementById("atrMap"), {
         zoom,
-        center
+        center,
+        styles: mapStyles  // mapStyles is housed in atrData.js
     });
 
     $(siteData).each( function( index,site ) {
         var marker = new google.maps.Marker({
             position: site.location,
             map: map,
-            animation: google.maps.Animation.DROP
+            animation: google.maps.Animation.DROP,
+            // darker hue: #556292 lighter hue: #AEB9DF
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                fillColor: '#AEB9DF',
+                fillOpacity: 0.7,
+                scale: 10,
+                strokeColor: '#556292',
+                strokeWeight: 2
+            }
             });
 
         marker.addListener("click", function() {
+            $(".chart-container").children("iframe").remove();
             $("#msgModalBody").html(loadingMsg);
+            $("#msgModalTitle").html(site.description);
             $("#msgModal").modal("show");
             fetchData(site.id,site.description);
             });
@@ -195,4 +218,5 @@ updateChart = (chart,data) => {
     chart.data = data;
     chart.update();
 }
+
 

@@ -25,10 +25,14 @@
 
     <div class="container">
         <div class="row">
-            <h1 class="text-center">Live traffic counts in <span class="btn btn-primary" id="localBtn">Beaufort County</span> and <span class="btn btn-primary" id="stateBtn">Beyond</span></h1>
-            <div id="atrMap" class="col-lg-12">
-                <!-- atr map goes here -->
+            <div class="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1 col-sm-10 col-sm-offset-1 col-xs-12 col-xs-offset-0">
+                <h1 class="text-center">Live traffic counts in <span class="btn btn-primary" id="localBtn">Beaufort County</span> and <span class="btn btn-primary" id="stateBtn">Beyond</span></h1>
             </div>
+        </div>
+        <div class="row">
+          <div id="atrMap" class="col-lg-12">
+                  <!-- atr map goes here -->
+          </div>
         </div>        
     </div>
 
@@ -65,8 +69,8 @@
             </div>
         <div class="row">
             <p>Vehicle counts:</p>
-            <div class="chart-container">
-                <canvas class="hourChart" id="recentChart"></canvas>
+            <div id="recentChartWrapper" class="chart-container">
+                <canvas id="recentChart"></canvas>
             </div>
         </div>
         <div class="chartBtn btn btn-primary btn-block" onclick="$('#hourlyDataModal').modal('show'); $('#recentDataModal').modal('hide')">Today by hour</div>
@@ -113,7 +117,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Status report</h4>
+        <h4 id="msgModalTitle" class="modal-title"></h4>
       </div>
       <div id="msgModalBody" class="modal-body">
         <!-- modal body content goes here -->
