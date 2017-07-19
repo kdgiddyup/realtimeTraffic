@@ -1,14 +1,12 @@
 $(document).ready(function(){
- 
+
     $("#localBtn").on("click",()=>{
-        newCenter = {lat: 32.486169, lng: -80.880322};
-        newZoom = 10;
-        initMap();
+        map.setCenter({lat: 32.486169, lng: -80.880322});
+        map.setZoom(10);
     })   
     $("#stateBtn").on("click",()=>{
-        newCenter = {lat:33.745892, lng:-80.859505};
-        newZoom = 8;
-        initMap();
+        map.setCenter({lat:33.707088, lng:-80.113444});
+        map.setZoom(8);
     })
 })// end doc ready
 
@@ -20,12 +18,12 @@ const apiHost = "https://scdotatrapi.herokuapp.com";
 
 var noDataMsg = 
     `<div class="panel-body">
-        <p class="noDataMsg">Nothing appearing? Try tapping/clicking that marker again... . If you still see no results, this counter might be offline.</p>
+        <p class="noDataMsg">Nothing appearing? Try tapping/clicking that marker again. If you still see no results, this counter might be offline.</p>
     </div>`;
 
 var loadingMsg = 
     `<div class="panel-body loader">
-        <h4>Attempting to load data ...</h4>
+        <h4>Looking for data ...</h4>
         <i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>
     </div>`;
 
@@ -49,6 +47,13 @@ fetchData = ( site, place ) => {
                     type: 'horizontalBar',
                     "options": hourChartOptions
                 });
+
+                // update place name
+                $(".modal-title").html(place);
+
+                // update directional labels
+                $(".dir1Label").html(response.dirNames[0]);
+                $(".dir2Label").html(response.dirNames[1]);
 
                 // full day charts
                 //direction 1 (appears in modal window established on index.html)
@@ -75,7 +80,6 @@ fetchData = ( site, place ) => {
         var historic = [response.histDir1[lastIndex], response.histDir2[lastIndex]];
         var speedDir1 = response.speedDir1[lastIndex];
         var speedDir2 = response.speedDir2[lastIndex];
-        console.log(speedDir1,speedDir2);
         
         $("#hourLabel").html(`Last update: ${hourArray[lastIndex]}`);
         $("#dir1Speed").html(speedDir1);
@@ -94,7 +98,7 @@ fetchData = ( site, place ) => {
                     backgroundColor: "#80CC7F"
                 }
             ],
-            "labels":["North or East lanes","South or West lanes"]
+            "labels":[response.dirNames[0],response.dirNames[1]]
         };
 
         updateChart(recentChart,recentData);
@@ -164,35 +168,28 @@ fetchData = ( site, place ) => {
 
 
 initMap = () => {
-    if (newCenter) 
-        var center = newCenter 
-    else 
-        var center= {lat: 32.486169, lng: -80.880322};
-    if (newZoom) 
-        var zoom = newZoom
-    else
-        var zoom = 10;
+    var center= {lat: 32.486169, lng: -80.880322};
+    var zoom = 10;
     
-    map = new google.maps.Map(document.getElementById('atrMap'), {
+    map = new google.maps.Map(document.getElementById("atrMap"), {
         zoom,
         center
     });
 
-        $(siteData).each( function( index,site ) {
+    $(siteData).each( function( index,site ) {
         var marker = new google.maps.Marker({
             position: site.location,
             map: map,
             animation: google.maps.Animation.DROP
-        });
+            });
 
         marker.addListener("click", function() {
             $("#msgModalBody").html(loadingMsg);
             $("#msgModal").modal("show");
             fetchData(site.id,site.description);
-        });
-    });   
+            });
+        }); 
 }
-
 // 
 updateChart = (chart,data) => {
     chart.data = data;
