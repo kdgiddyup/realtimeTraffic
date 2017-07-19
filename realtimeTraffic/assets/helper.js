@@ -139,7 +139,7 @@ fetchData = ( site, place ) => {
         var dir1FullDay = {
             datasets: [
                 {
-                    "label":"Actual",
+                    "label":"Today",
                     "display": false,
                     "data":response.actualDir1,
                     "backgroundColor": "#6C55B2",
@@ -171,7 +171,7 @@ fetchData = ( site, place ) => {
        var dir2FullDay = {
             datasets: [
                 {
-                    "label":"Count",
+                    "label":"Today",
                     "data":response.actualDir2,
                     backgroundColor: "#6C55B2",
                     "yAxisID": "y-axis-0",
