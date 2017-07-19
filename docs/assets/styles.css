@@ -6,7 +6,7 @@ li.site {
 }
 .modal-title {
     font-weight: bold;
-    font-size: 1.5em
+    font-size: 1.2em
 }
 .chart-container {
     margin: 10px 0
@@ -15,6 +15,9 @@ li.site {
     font-weight: bold;
     font-size: 3em;
 }
+.dir1Label, .dir2Label {
+    font-size: .8em;
+}
 .modal-body {
     padding: 0 30px;
     overflow: auto;
@@ -22,6 +25,15 @@ li.site {
 .chartBtn {
     margin: 20px 0;
 }
-#hourLabel {
+#speedLabel,#countLabel {
+    text-align: center;
     font-weight: bold;
+}
+#countLabel {
+    margin: 10px 0 -10px 0;
+}
+#hourLabel {
+    font-size: 1.5em;
+    text-align: center;
+    font-weight: bold
 }

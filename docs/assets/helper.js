@@ -10,11 +10,32 @@ $(document).ready(function(){
     })
 })// end doc ready
 
+// some ChartJs configs
+// set chart scales to start at 0
 Chart.scaleService.updateScaleDefaults('linear', {
     ticks: {
         min: 0
     }
 });
+
+// link first two legend items together and hide them by default on full-day charts
+var defaultLegendClickHandler = Chart.defaults.global.legend.onClick;
+var newLegendClickHandler = function (e, legendItem) {
+    var index = legendItem.datasetIndex;
+
+    if (index > 1) {
+        // Do the original logic
+        defaultLegendClickHandler(e, legendItem);
+    } else {
+        let ci = this.chart;
+        [ci.getDatasetMeta(0),
+         ci.getDatasetMeta(1)].forEach(function(meta) {
+            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+        });
+        ci.update();
+    }
+};
+
 
 localCenter = {lat: 32.353968, lng: -80.893852};
 localZoom = 9;
@@ -113,22 +134,26 @@ fetchData = ( site, place ) => {
         };
 
         updateChart(recentChart,recentData);
-        
+
         // full day data comes back from my API already in correct format, so just plug it in:                
         var dir1FullDay = {
             datasets: [
                 {
                     "label":"Actual",
+                    "display": false,
                     "data":response.actualDir1,
-                    backgroundColor: "#6C55B2",
-                    "yAxisID": "y-axis-0"
+                    "backgroundColor": "#6C55B2",
+                    "yAxisID": "y-axis-0",
+                    "hidden": true
                 },
                 {
                     "label":"Historic",
+                    "display": false,
                     "data":response.histDir1,
-                    backgroundColor: "#FF9130",
+                    "backgroundColor": "#FF9130",
                     "type": "line",
-                    "yAxisID": "y-axis-0"
+                    "yAxisID": "y-axis-0",
+                    "hidden" : true
                 },
                 {
                     "label":"Avg mph",
@@ -149,14 +174,16 @@ fetchData = ( site, place ) => {
                     "label":"Count",
                     "data":response.actualDir2,
                     backgroundColor: "#6C55B2",
-                    "yAxisID": "y-axis-0"
+                    "yAxisID": "y-axis-0",
+                    "hidden":true
                 },
                 {
                     "label":"Historic",
                     "data":response.histDir2,
                     backgroundColor: "#FF9130",
                     "type": "line",
-                    "yAxisID": "y-axis-0"
+                    "yAxisID": "y-axis-0",
+                    "hidden":true
                 },
                 {
                     "label":"Avg mph",
@@ -170,7 +197,6 @@ fetchData = ( site, place ) => {
             // labels would be times for the whole chart
             "labels": hourArray
         }  // end of data object
-        console.log("dir1 data:",dir1FullDay,"dir2 data:",dir2FullDay);
              updateChart(dir1Day,dir1FullDay);
              updateChart(dir2Day,dir2FullDay);
         }
