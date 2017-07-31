@@ -1,4 +1,5 @@
 $(document).ready(function(){
+
     $("#localBtn").on("click",()=>{
         map.setCenter(localCenter);
         map.setZoom(localZoom);
@@ -8,6 +9,11 @@ $(document).ready(function(){
         map.setCenter(stateCenter);
         map.setZoom(stateZoom); 
     })
+
+    // initialize vehicle count gauges
+    $('#dir1Gauge .gauge-arrow').cmGauge();
+    $('#dir2Gauge .gauge-arrow').cmGauge();
+
 })// end doc ready
 
 // some ChartJs configs
@@ -74,11 +80,6 @@ fetchData = ( site, place ) => {
             $("#recentDataModal").modal("show");
 
             // chart init and config has to occur after modal is populated, since canvases aren't placed until then
-            // recent hour chart
-            var recentChart = new Chart($("#recentChart"),{
-                type: 'horizontalBar',
-                "options": hourChartOptions
-            });
 
             // update place name
             $(".modal-title").html(place);
@@ -99,7 +100,7 @@ fetchData = ( site, place ) => {
                 "options": dayChartOptions
             });    
     
-        // find last actual data
+        // find latest hour of data from API call response 
         
         let hourArray = ['1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM', '4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM','12 AM'];
 
@@ -108,33 +109,33 @@ fetchData = ( site, place ) => {
         else 
             var lastIndex = 23;
         
-        var current = [response.actualDir1[lastIndex], response.actualDir2[lastIndex]];
-        var historic = [response.histDir1[lastIndex], response.histDir2[lastIndex]];
+        var currentDir1 = response.actualDir1[lastIndex];
+        var currentDir2 = response.actualDir2[lastIndex];
+        var historicDir1 = response.histDir1[lastIndex];
+        var historicDir2 = response.histDir2[lastIndex];
+        
+        // what is the ratio of current vehicle count vs. typical count?
+        // we'll need this for our gauge graphic
+        var ratioDir1 = Math.floor( currentDir1 / historicDir1 * 100);
+        var ratioDir2 = Math.floor( currentDir2 / historicDir2 * 100);
+
         var speedDir1 = response.speedDir1[lastIndex];
         var speedDir2 = response.speedDir2[lastIndex];
+
         
         $("#hourLabel").html(`Last update: ${hourArray[lastIndex]}`);
         $("#dir1Speed").html(speedDir1);
         $("#dir2Speed").html(speedDir2);
 
-        var recentData = {
-            datasets: [
-                {
-                    "label": "Current",
-                    "data": current,
-                    backgroundColor: "#6C55B2"
-                },
-                {
-                    "label": "Typical",
-                    "data": historic,
-                    backgroundColor: "#80CC7F"
-                }
-            ],
-            "labels":[response.dirNames[0],response.dirNames[1]]
-        };
+        // update vehicle count gauges for each direction of travel
+        // we want 100% to be at the middle of the gauge, so we divide ratio in half  
 
-        updateChart(recentChart,recentData);
-
+        $("#dir1Gauge .gauge-arrow").trigger("updateGauge", ratioDir1/2);
+        $("#dir2Gauge .gauge-arrow").trigger("updateGauge", ratioDir2/2);
+        
+        // update count labels
+        $("#dir1count").html(`${currentDir1} vehicles (${ratioDir1}% of normal)`)
+        $("#dir2count").html(`${currentDir2} vehicles (${ratioDir2}% of normal)`)
         // full day data comes back from my API already in correct format, so just plug it in:                
         var dir1FullDay = {
             datasets: [
