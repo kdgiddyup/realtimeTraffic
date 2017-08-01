@@ -69,18 +69,6 @@ fetchData = ( site, place ) => {
             $(".dir1Label").html(response.dirNames[0]);
             $(".dir2Label").html(response.dirNames[1]);
 
-            // full day charts
-            //direction 1 (appears in modal window established on index.html)
-            var dir1Day = new Chart($("#dir1day"), {
-                type: 'bar',
-                "options": dayChartOptions
-            });    
-            // direction 2 (also on index.html modal div)
-            var dir2Day = new Chart($("#dir2day"), {
-                type: 'bar',
-                "options": dayChartOptions
-            });    
-    
         // find latest hour of data from API call response 
         
         let hourArray = ['1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM', '4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM','12 AM'];
@@ -177,10 +165,42 @@ fetchData = ( site, place ) => {
 
             // labels would be times for the whole chart
             "labels": hourArray
-        }  // end of data object
-             updateChart(dir1Day,dir1FullDay);
-             updateChart(dir2Day,dir2FullDay);
-        }
+        };  // end of data object
+
+        // update charts: 
+        // to avoid ghost data in chart canvas, remove and re-append a rebuilt canvas with every modal call
+        var day1canvas = $("<canvas>").attr(
+            {
+                "class":"dayChart", 
+                "data-id":"dir1",
+                "id":"dir1day"
+            });
+        var day2canvas = $("<canvas>").attr(
+            {
+                "class":"dayChart", 
+                "data-id":"dir2",
+                "id":"dir2day"
+            });
+        $("#dir1Container").empty().append(day1canvas);
+        $("#dir2Container").empty().append(day2canvas);
+        
+        //instantiate direction 1 chart, add data and update )
+        var dir1Day = new Chart($("#dir1day"), {
+            type: 'bar',
+            "options": dayChartOptions // options are stored in atrData.js
+        });
+        dir1Day.data = dir1FullDay;
+        dir1Day.update();
+
+        // direction 2
+        var dir2Day = new Chart($("#dir2day"), {
+            type: 'bar',
+            "options": dayChartOptions
+        });   
+        dir2Day.data = dir2FullDay;
+        dir1Day.update();
+
+        }; // end positive data condition
     }); // end ajax call
 } // end fetchData function
 
@@ -221,11 +241,6 @@ initMap = () => {
             fetchData(site.id,site.description);
             });
         }); 
-}
-// 
-updateChart = (chart,data) => {
-    chart.data = data;
-    chart.update();
 }
 
 
