@@ -24,25 +24,6 @@ Chart.scaleService.updateScaleDefaults('linear', {
     }
 });
 
-// link first two legend items together and hide them by default on full-day charts
-var defaultLegendClickHandler = Chart.defaults.global.legend.onClick;
-var newLegendClickHandler = function (e, legendItem) {
-    var index = legendItem.datasetIndex;
-
-    if (index > 1) {
-        // Do the original logic
-        defaultLegendClickHandler(e, legendItem);
-    } else {
-        let ci = this.chart;
-        [ci.getDatasetMeta(0),
-         ci.getDatasetMeta(1)].forEach(function(meta) {
-            meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
-        });
-        ci.update();
-    }
-};
-
-
 localCenter = {lat: 32.353968, lng: -80.893852};
 localZoom = 9;
 
@@ -136,25 +117,24 @@ fetchData = ( site, place ) => {
         // update count labels
         $("#dir1count").html(`${currentDir1} vehicles (${ratioDir1}% of normal)`)
         $("#dir2count").html(`${currentDir2} vehicles (${ratioDir2}% of normal)`)
+        
         // full day data comes back from my API already in correct format, so just plug it in:                
         var dir1FullDay = {
             datasets: [
                 {
                     "label":"Today",
-                    "display": false,
                     "data":response.actualDir1,
                     "backgroundColor": "#6C55B2",
                     "yAxisID": "y-axis-0",
-                    "hidden": true
+                    "hidden": false
                 },
                 {
                     "label":"Historic",
-                    "display": false,
                     "data":response.histDir1,
                     "backgroundColor": "#FF9130",
                     "type": "line",
                     "yAxisID": "y-axis-0",
-                    "hidden" : true
+                    "hidden" : false
                 },
                 {
                     "label":"Avg mph",
@@ -176,7 +156,7 @@ fetchData = ( site, place ) => {
                     "data":response.actualDir2,
                     backgroundColor: "#6C55B2",
                     "yAxisID": "y-axis-0",
-                    "hidden":true
+                    "hidden":false
                 },
                 {
                     "label":"Historic",
@@ -184,7 +164,7 @@ fetchData = ( site, place ) => {
                     backgroundColor: "#FF9130",
                     "type": "line",
                     "yAxisID": "y-axis-0",
-                    "hidden":true
+                    "hidden":false
                 },
                 {
                     "label":"Avg mph",
@@ -236,6 +216,8 @@ initMap = () => {
             $("#msgModalBody").html(loadingMsg);
             $("#msgModalTitle").html(site.description);
             $("#msgModal").modal("show");
+            
+            // make api call to get data; final argument is an attempt counter
             fetchData(site.id,site.description);
             });
         }); 

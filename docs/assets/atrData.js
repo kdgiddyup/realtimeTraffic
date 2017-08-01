@@ -104,10 +104,6 @@ const hourChartOptions =
     
 const dayChartOptions = 
     { 
-      "legend":
-          {
-            "onClick": newLegendClickHandler
-          },
       "barThickness": 5,
         "labels": 
             {
