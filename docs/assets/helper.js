@@ -83,10 +83,21 @@ fetchData = ( site, place ) => {
         var historicDir1 = response.histDir1[lastIndex];
         var historicDir2 = response.histDir2[lastIndex];
         
+
         // what is the ratio of current vehicle count vs. typical count?
         // we'll need this for our gauge graphic
-        var ratioDir1 = Math.floor( currentDir1 / historicDir1 * 100);
-        var ratioDir2 = Math.floor( currentDir2 / historicDir2 * 100);
+        if (currentDir1 == 0 || historicDir1 == 0) {
+            var ratioDir1 = 0
+        }
+        else { 
+            ratioDir1 = Math.floor( currentDir1 / historicDir1 * 100);
+        };
+        if (currentDir2 == 0 || historicDir2 == 0) {
+            var ratioDir2 = 0
+        }
+        else { 
+            ratioDir2 = Math.floor( currentDir2 / historicDir2 * 100);
+        };
 
         var speedDir1 = response.speedDir1[lastIndex];
         var speedDir2 = response.speedDir2[lastIndex];
@@ -242,5 +253,3 @@ initMap = () => {
             });
         }); 
 }
-
-
